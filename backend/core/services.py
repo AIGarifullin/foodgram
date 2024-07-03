@@ -3,8 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from django.db.models import Sum
 from django.http import HttpResponse
-from rest_framework import serializers
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response

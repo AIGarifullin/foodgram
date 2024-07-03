@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from recipes.constants import (MAX_ING_STR_LENGTH_1, MAX_ING_STR_LENGTH_2,

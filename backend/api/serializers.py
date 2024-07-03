@@ -1,4 +1,3 @@
-from drf_extra_fields.fields import Base64ImageField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, IntegerField
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -6,10 +5,11 @@ from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
                                         StringRelatedField)
 from rest_framework.validators import UniqueTogetherValidator
 
-from core.services import add_ingredients, check_recipe, check_subscribe
+from core.services import (add_ingredients, Base64ImageField,
+                           check_recipe, check_subscribe)
 from recipes.constants import MAX_VALUE, MIN_VALUE
 from recipes.models import (Favorite, Ingredient, Recipe,
-                            RecipeIngredient, Tag, ShoppingCart)
+                            RecipeIngredient, ShoppingCart, Tag)
 from users.constants import MAX_LENGTH_NAME
 from users.models import Subscription, User
 

@@ -1,9 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser import views as djoser_views
 from rest_framework import status
-from rest_framework.mixins import ListModelMixin
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,15 +11,15 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.permissions import IsAdminAuthorOrReadOnly
-from api.serializers import (IngredientSerializer, TagSerializer,
+from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              RecipeCreateUpdateSerializer, RecipeGetSerializer,
-                             RecipeShortLinkSerializer,
-                             FavoriteSerializer, ShoppingCartSerializer,
-                             SubscriptionSerializer, UserAvatarSerializer,
+                             RecipeShortLinkSerializer, ShoppingCartSerializer,
+                             SubscriptionSerializer, TagSerializer,
+                             UserAvatarSerializer,
                              UserSubscribeRepresentSerializer)
 from core.services import get_shopping_cart, RecipeFunction
 from recipes.models import (Favorite, Ingredient, Recipe,
-                            Tag, ShoppingCart)
+                            ShoppingCart, Tag)
 
 from users.models import User
 
