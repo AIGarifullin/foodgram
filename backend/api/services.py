@@ -1,7 +1,6 @@
 from django.db.models import Sum
 from django.http import Http404, HttpResponse
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
@@ -56,7 +55,7 @@ def execute_add_recipe(serializer_name, request, pk):
     try:
         recipe = get_object_or_404(Recipe, id=pk)
         return add_recipe(serializer_name, request, recipe)
-    except Recipe.DoesNotExist:
+    except Http404:
         return Response(
             {'error': 'Рецепт с указанным идентификатором не найден.'},
             status=status.HTTP_404_NOT_FOUND)
