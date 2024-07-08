@@ -1,7 +1,7 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-class IsAuthorOrReadOnly(BasePermission):
+class IsAuthenticatedAuthorOrReadOnly(BasePermission):
     """Права доступа для администратора и автора."""
 
     message = 'Недостаточно прав для доступа.'

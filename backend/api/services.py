@@ -29,7 +29,6 @@ def create_ingredients(ingredients, recipe):
     RecipeIngredient.objects.bulk_create(ingredient_list)
 
 
-@staticmethod
 def add_recipe(serializer_name, request, recipe):
     """Добавить рецепт."""
     serializer = serializer_name(
@@ -41,7 +40,6 @@ def add_recipe(serializer_name, request, recipe):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@staticmethod
 def delete_recipe(model, request, recipe, err_msg):
     """Удалить рецепт."""
     obj = model.objects.filter(user=request.user, recipe=recipe)

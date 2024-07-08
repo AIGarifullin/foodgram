@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'default_key')
 
-DEBUG = (os.getenv('DEBUG', 'False') == 'True')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split()
 
@@ -102,7 +102,7 @@ DJOSER = {
     },
     'PERMISSIONS': {
         'user_list': ('rest_framework.permissions.AllowAny',),
-        'user': ('api.permissions.IsAuthorOrReadOnly',)
+        'user': ('api.permissions.IsAuthenticatedAuthorOrReadOnly',)
     }
 }
 

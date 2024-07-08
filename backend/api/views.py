@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from api.filters import IngredientFilter, RecipeFilter
-from api.permissions import IsAuthorOrReadOnly
+from api.permissions import IsAuthenticatedAuthorOrReadOnly
 from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              RecipeCreateUpdateSerializer, RecipeGetSerializer,
                              RecipeShortLinkSerializer, ShoppingCartSerializer,
@@ -69,7 +69,7 @@ class TagViewSet(ModelViewSet):
     http_method_names = ['get']
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthenticatedAuthorOrReadOnly,)
     pagination_class = None
 
 
@@ -80,7 +80,7 @@ class RecipeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthenticatedAuthorOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
@@ -130,7 +130,7 @@ class RecipeViewSet(ModelViewSet):
 class SubscriptionView(APIView):
     """Подписка на пользователя."""
 
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthenticatedAuthorOrReadOnly,)
 
     def post(self, request, user_id):
         author = get_object_or_404(User, id=user_id)
