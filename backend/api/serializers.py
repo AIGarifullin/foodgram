@@ -186,7 +186,8 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
                                       f'ингредиент {item}.')
         unique_ingredients = set(str(item) for item in ingredients)
         unique_ingredients_list = [eval(item) for item
-                                   in unique_ingredients]
+                                   in unique_ingredients
+                                   if isinstance(eval(item), OrderedDict)]
         if len(unique_ingredients_list) != len(ingredients):
             raise ValidationError('Ингредиенты должны быть уникальными.')
         return ingredients
