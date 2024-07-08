@@ -1,13 +1,16 @@
+from collections import OrderedDict
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, IntegerField
-from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
+from rest_framework.serializers import (ModelSerializer,
+                                        PrimaryKeyRelatedField,
+                                        SerializerMethodField,
                                         StringRelatedField)
 from rest_framework.validators import UniqueTogetherValidator
 
-from core.services import (add_ingredients, Base64ImageField,
-                           check_recipe, check_subscribe)
-from recipes.constants import MAX_VALUE, MIN_VALUE
+from api.services import check_recipe, create_ingredients
+from recipes.constants import (MAX_VALUE_AMOUNT, MAX_VALUE_COOKING_TIME,
+                               MIN_VALUE_AMOUNT, MIN_VALUE_COOKING_TIME)
 from recipes.models import (Favorite, Ingredient, Recipe,
                             RecipeIngredient, ShoppingCart, Tag)
 from users.constants import MAX_LENGTH_NAME
@@ -28,7 +31,8 @@ class UserSerializer(ModelSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        return check_subscribe(request, obj)
+        return (request.user.is_authenticated
+                and request.user.follower.filter(author=obj).exists())
 
 
 class UserAvatarSerializer(ModelSerializer):
@@ -60,13 +64,13 @@ class IngredientPostSerializer(ModelSerializer):
 
     id = IntegerField()
     amount = IntegerField(
-        min_value=MIN_VALUE,
-        max_value=MAX_VALUE,
+        min_value=MIN_VALUE_AMOUNT,
+        max_value=MAX_VALUE_AMOUNT,
         error_messages={
             'min_value': f'Убедитесь, что значение больше либо'
-                         f' равно {MIN_VALUE}',
+                         f' равно {MIN_VALUE_AMOUNT}',
             'max_value': f'Убедитесь, что значение меньше либо'
-                         f' равно {MAX_VALUE}',
+                         f' равно {MAX_VALUE_AMOUNT}',
         }
     )
 
@@ -153,13 +157,13 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
                                            source='recipe_ingredients')
     image = Base64ImageField()
     cooking_time = IntegerField(
-        min_value=MIN_VALUE,
-        max_value=MAX_VALUE,
+        min_value=MIN_VALUE_COOKING_TIME,
+        max_value=MAX_VALUE_COOKING_TIME,
         error_messages={
             'min_value': f'Убедитесь, что значение больше либо'
-                         f' равно {MIN_VALUE} минуте',
+                         f' равно {MIN_VALUE_COOKING_TIME} минуте',
             'max_value': f'Убедитесь, что значение меньше либо'
-                         f' равно {MAX_VALUE} минут',
+                         f' равно {MAX_VALUE_COOKING_TIME} минут',
         }
     )
 
@@ -176,17 +180,16 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         return data
 
     def validate_ingredients(self, ingredients):
-        ingredients_list = []
+        print(ingredients)
         for item in ingredients:
-            try:
-                ingredient = Ingredient.objects.get(id=item['id'])
-            except Ingredient.DoesNotExist:
-                raise ValidationError('Указан несуществующий ингредиент.')
-
-            if ingredient in ingredients_list:
-                raise ValidationError('Ингредиенты должны быть уникальными.')
-
-            ingredients_list.append(ingredient)
+            print(item)
+            if not Ingredient.objects.filter(id=item['id']).exists():
+                raise ValidationError(f'Указан несуществующий'
+                                      f'ингредиент {item}.')
+        unique_ingredients = set(str(od) for od in ingredients)
+        unique_ingredients_list = [eval(item) for item in unique_ingredients]
+        if len(unique_ingredients_list) != len(ingredients):
+            raise ValidationError('Ингредиенты должны быть уникальными.')
         return ingredients
 
     def validate_tags(self, tags):
@@ -210,7 +213,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(author=request.user, **validated_data)
         recipe.tags.set(tags)
-        add_ingredients(ingredients, recipe)
+        create_ingredients(ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
@@ -220,7 +223,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         instance.tags.set(tags)
         RecipeIngredient.objects.filter(recipe=instance).delete()
         super().update(instance, validated_data)
-        add_ingredients(ingredients, instance)
+        create_ingredients(ingredients, instance)
         instance.save()
         return instance
 

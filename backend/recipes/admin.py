@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from recipes.constants import MIN_VALUE
+from recipes.constants import MIN_VALUE_AMOUNT
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            RecipeTag, ShoppingCart, Tag)
+                            ShoppingCart, Tag)
 
 
 @admin.register(Ingredient)
@@ -40,25 +40,7 @@ class RecipeIngredientInline(admin.TabularInline):
     для связующей модели RecipeIngredient."""
 
     model = RecipeIngredient
-    min_num = MIN_VALUE
-    extra = 0
-
-
-@admin.register(RecipeTag)
-class RecipeTagAdmin(admin.ModelAdmin):
-    """Модель RecipeTagAdmin."""
-
-    list_display = ('id', 'recipe', 'tag')
-    search_fields = ('recipe', 'tag')
-    list_filter = ('recipe', 'tag')
-
-
-class RecipeTagInline(admin.TabularInline):
-    """Встраиваемая форма-модель RecipeTagInline
-    для связующей модели RecipeTag."""
-
-    model = RecipeTag
-    min_num = MIN_VALUE
+    min_num = MIN_VALUE_AMOUNT
     extra = 0
 
 
@@ -71,7 +53,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'author')
     list_filter = ('name', 'author', 'tags')
     list_display_links = ('name',)
-    inlines = (RecipeIngredientInline, RecipeTagInline)
+    inlines = (RecipeIngredientInline,)
     readonly_fields = ('get_favorites_amount',)
 
     @admin.display(description='В избранном')

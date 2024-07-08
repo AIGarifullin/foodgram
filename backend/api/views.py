@@ -10,17 +10,17 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from api.filters import IngredientFilter, RecipeFilter
-from api.permissions import IsAdminAuthorOrReadOnly
+from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (FavoriteSerializer, IngredientSerializer,
                              RecipeCreateUpdateSerializer, RecipeGetSerializer,
                              RecipeShortLinkSerializer, ShoppingCartSerializer,
                              SubscriptionSerializer, TagSerializer,
                              UserAvatarSerializer,
                              UserSubscribeRepresentSerializer)
-from core.services import get_shopping_cart, RecipeFunction
+from api.services import (execute_add_recipe, execute_delete_recipe,
+                          get_shopping_cart)
 from recipes.models import (Favorite, Ingredient, Recipe,
                             ShoppingCart, Tag)
-
 from users.models import User
 
 
@@ -69,7 +69,7 @@ class TagViewSet(ModelViewSet):
     http_method_names = ['get']
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (IsAdminAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
     pagination_class = None
 
 
@@ -80,7 +80,7 @@ class RecipeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    permission_classes = (IsAdminAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
@@ -97,22 +97,28 @@ class RecipeViewSet(ModelViewSet):
                         status=status.HTTP_200_OK)
 
     @action(detail=True, permission_classes=(IsAuthenticated,),
-            methods=('post', 'delete'))
+            methods=('post',))
     def favorite(self, request, pk):
-        """Добавление и удаление рецептов из избранного."""
-        recipe_function = RecipeFunction()
+        """Добавление рецептов в избранного."""
+        return execute_add_recipe(FavoriteSerializer, request, pk)
+
+    @favorite.mapping.delete
+    def delete_recipe_favorite(self, request, pk):
+        """Удаление рецептов из избранного."""
         err_msg = 'Рецепт отсутствует в избранном.'
-        return recipe_function.execute(
-            FavoriteSerializer, Favorite, request, pk, err_msg)
+        return execute_delete_recipe(Favorite, request, pk, err_msg)
 
     @action(detail=True, permission_classes=(IsAuthenticated,),
-            methods=('post', 'delete'))
+            methods=('post',))
     def shopping_cart(self, request, pk):
-        """Добавление и удаление рецептов из списка покупок."""
-        recipe_function = RecipeFunction()
+        """Добавление рецептов в список покупок."""
+        return execute_add_recipe(ShoppingCartSerializer, request, pk)
+
+    @shopping_cart.mapping.delete
+    def delete_recipe_shopping_cart(self, request, pk):
+        """Удаление рецептов из списка покупок."""
         err_msg = 'Рецепт отсутствует в списке покупок.'
-        return recipe_function.execute(
-            ShoppingCartSerializer, ShoppingCart, request, pk, err_msg)
+        return execute_delete_recipe(ShoppingCart, request, pk, err_msg)
 
     @action(detail=False, permission_classes=(IsAuthenticated,),
             methods=('get',))
@@ -124,7 +130,7 @@ class RecipeViewSet(ModelViewSet):
 class SubscriptionView(APIView):
     """Подписка на пользователя."""
 
-    permission_classes = (IsAdminAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def post(self, request, user_id):
         author = get_object_or_404(User, id=user_id)
