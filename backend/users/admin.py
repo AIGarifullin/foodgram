@@ -20,8 +20,8 @@ class UserAdmin(admin.ModelAdmin):
 
     @admin.display(description='Аватар')
     def get_avatar(self, obj):
-        if obj.image:
-            return mark_safe(f'<img src={obj.image.url} '
+        if obj.avatar:
+            return mark_safe(f'<img src={obj.avatar.url} '
                              'width="40" height="30">')
 
     @admin.display(description='Количество рецептов')
