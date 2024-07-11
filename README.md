@@ -8,7 +8,7 @@
 Python, Django REST Framework, Nginx, DNS, HTTPS, Docker, PostgreSQL, GitHub Actions
 
 ## Ссылка на развернутый проект
-https:// ...
+https://foodgramprojaig.ddns.net
 
 ## Запуск документации проекта
 Находясь в папке infra, выполните команду **docker-compose up**. При выполнении этой команды контейнер `frontend`, описанный в **docker-compose.yml**, подготовит файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою работу.
@@ -21,7 +21,10 @@ https:// ...
 ```
 docker compose up
 docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py collectstatic
+docker compose exec backend cp -r /app/static/. /backend_static/static/
 ```
+
 ## Отличия обычной версии проекта от продакш
 Продакш-версия проекта позволяет:
 * Автоматизировать запуск и обновление приложения;
@@ -36,7 +39,7 @@ docker compose exec backend python manage.py migrate
     docker build -t username/foodgram_frontend .
     cd ../backend
     docker build -t username/foodgram_backend .
-    cd ../nginx
+    cd ../infra
     docker build -t username/foodgram_gateway .
     ```
     ```
@@ -63,21 +66,23 @@ docker compose exec backend python manage.py migrate
     ```
     Выполнить миграции, собрать статические файлы бэкенда и скопировать их в `/backend_static/static/`:
     ```
+    sudo docker compose -f docker-compose.production.yml exec backend python manage.py makemigrations
     sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
     sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
     sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/static/. /backend_static/static/
+    sudo docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser
     ```
 5. Настроить «внешний» Nginx, что вне контейнера — для работы с приложением в контейнерах.
     Открыть файл **default** конфигурации Nginx:
     
     ```
-    nano /etc/nginx/sites-enabled/default
+    sudo nano /etc/nginx/sites-enabled/default
     ```
     Изменить настройки `location` в секции `server` (три блока `location` заменить на один):
     ```
     location / {
         proxy_set_header Host $http_host;
-        proxy_pass http://127.0.0.1:9000;
+        proxy_pass http://127.0.0.1:7000;
     }
     ```
     Сделать проверку и перезагрузку файла конфигурации:

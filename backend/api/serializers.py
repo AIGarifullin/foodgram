@@ -143,7 +143,7 @@ class RecipeShortLinkSerializer(ModelSerializer):
 
     def get_short_link(self, obj):
         if obj.id is not None:
-            base_url = 'https://127.0.0.1:8000/recipes/'
+            base_url = 'https://127.0.0.1:7000/recipes/'
             short_link = f'{base_url}{obj.id}/'
             return short_link
         return None
