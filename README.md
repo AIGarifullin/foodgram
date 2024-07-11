@@ -108,4 +108,5 @@ docker compose exec backend cp -r /app/static/. /backend_static/static/
     Для управления процессами *CI/CD* (*Continuous Integration/Continuous Delivery*) открыть раздел *Actions* в репозитории проекта в своем аккаунте.
 
 
+
 _Текст данного файла составил [Адель Гарифуллин](https://github.com/AIGarifullin)._
