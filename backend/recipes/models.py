@@ -1,8 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from recipes.constants import (MAX_ING_NAME_LENGTH, MAX_ING_MEAS_UNIT_LENGTH,
-                               MAX_REC_SHORT_LINK_LENGTH, MAX_REC_NAME_LENGTH,
+from recipes.constants import (MAX_ING_MEAS_UNIT_LENGTH, MAX_ING_NAME_LENGTH,
+                               MAX_REC_NAME_LENGTH, MAX_REC_SHORT_LINK_LENGTH,
                                MAX_TAG_NAME_LENGTH, MAX_TAG_SLUG_LENGTH,
                                MAX_VALUE_AMOUNT, MAX_VALUE_COOKING_TIME,
                                MIN_VALUE_AMOUNT, MIN_VALUE_COOKING_TIME)
