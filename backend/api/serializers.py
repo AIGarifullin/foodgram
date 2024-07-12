@@ -184,7 +184,7 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
         for item in ingredients:
             if not Ingredient.objects.filter(id=item['id']).exists():
                 raise ValidationError(f'Указан несуществующий'
-                                      f'ингредиент {item}.')
+                                      f' ингредиент {item}.')
         unique_ingredients = set(str(item) for item in ingredients)
         unique_ingredients_list = [eval(item) for item
                                    in unique_ingredients
