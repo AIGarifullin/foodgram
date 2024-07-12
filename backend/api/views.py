@@ -91,7 +91,7 @@ class RecipeViewSet(ModelViewSet):
             methods=('get',), serializer_class=RecipeShortLinkSerializer)
     def get_link(self, request, pk=None):
         recipe = self.get_object()
-        base_url = 'https://127.0.0.1:7000/recipes/'
+        base_url = 'https://foodgramprojaig.ddns.net/recipes/'
         short_link = f'{base_url}{recipe.id}/'
         return Response({'short-link': short_link},
                         status=status.HTTP_200_OK)
