@@ -60,10 +60,34 @@ class IngredientSerializer(ModelSerializer):
         read_only_fields = ('__all__',)
 
 
-class IngredientPostSerializer(ModelSerializer):
-    """Сериализатор для модели Ingredient (POST-запросы)."""
+class TagSerializer(ModelSerializer):
+    """ Сериализатор для модели Tag."""
 
-    id = IntegerField()
+    class Meta:
+        model = Tag
+        fields = '__all__'
+        read_only_fields = ('__all__',)
+
+
+class RecipeIngredientGetSerializer(ModelSerializer):
+    """ Сериализатор для модели RecipeIngredient (GET-запросы)."""
+
+    id = IntegerField(source='ingredient.id', read_only=True)
+    name = StringRelatedField(source='ingredient.name', read_only=True)
+    measurement_unit = StringRelatedField(
+        source='ingredient.measurement_unit',
+        read_only=True)
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+
+
+class RecipeIngredientPostSerializer(ModelSerializer):
+    """Сериализатор для модели RecipeIngredient (POST-запросы)."""
+
+    # id = IntegerField()
+    id = PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     amount = IntegerField(
         min_value=MIN_VALUE_AMOUNT,
         max_value=MAX_VALUE_AMOUNT,
@@ -80,35 +104,14 @@ class IngredientPostSerializer(ModelSerializer):
         fields = ('id', 'amount')
 
 
-class TagSerializer(ModelSerializer):
-    """ Сериализатор для модели Tag."""
-
-    class Meta:
-        model = Tag
-        fields = '__all__'
-        read_only_fields = ('__all__',)
-
-
-class RecipeIngredientSerializer(ModelSerializer):
-    """ Сериализатор для модели RecipeIngredient (GET-запросы)."""
-
-    name = StringRelatedField(source='ingredient.name', read_only=True)
-    measurement_unit = StringRelatedField(
-        source='ingredient.measurement_unit',
-        read_only=True)
-
-    class Meta:
-        model = RecipeIngredient
-        fields = ('id', 'name', 'measurement_unit', 'amount')
-
-
 class RecipeGetSerializer(ModelSerializer):
     """Сериализатор получения информации о рецептах."""
 
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = RecipeIngredientSerializer(many=True, read_only=True,
-                                             source='recipe_ingredients')
+    ingredients = RecipeIngredientGetSerializer(
+        many=True, read_only=True,
+        source='recipe_ingredients')
     is_favorited = SerializerMethodField(method_name='get_is_favorited',
                                          read_only=True)
     is_in_shopping_cart = SerializerMethodField(
@@ -154,8 +157,8 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
     """ Сериализатор для модели Recipe (POST-запросы)."""
 
     tags = PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
-    ingredients = IngredientPostSerializer(many=True,
-                                           source='recipe_ingredients')
+    ingredients = RecipeIngredientPostSerializer(many=True,
+                                                 source='recipe_ingredients')
     image = Base64ImageField()
     cooking_time = IntegerField(
         min_value=MIN_VALUE_COOKING_TIME,
@@ -182,7 +185,8 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
 
     def validate_ingredients(self, ingredients):
         for item in ingredients:
-            if not Ingredient.objects.filter(id=item['id']).exists():
+            # print('item is', item)
+            if not Ingredient.objects.filter(id=item['ingredient_id']).exists():
                 raise ValidationError(f'Указан несуществующий'
                                       f' ингредиент {item}.')
         unique_ingredients = set(str(item) for item in ingredients)
