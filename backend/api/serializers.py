@@ -86,8 +86,7 @@ class RecipeIngredientGetSerializer(ModelSerializer):
 class RecipeIngredientPostSerializer(ModelSerializer):
     """Сериализатор для модели RecipeIngredient (POST-запросы)."""
 
-    # id = IntegerField()
-    id = PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    id = IntegerField(source='ingredient.id')
     amount = IntegerField(
         min_value=MIN_VALUE_AMOUNT,
         max_value=MAX_VALUE_AMOUNT,
@@ -185,8 +184,8 @@ class RecipeCreateUpdateSerializer(ModelSerializer):
 
     def validate_ingredients(self, ingredients):
         for item in ingredients:
-            # print('item is', item)
-            if not Ingredient.objects.filter(id=item['id']).exists():
+            if not Ingredient.objects.filter(
+                    id=item['ingredient']['id']).exists():
                 raise ValidationError(f'Указан несуществующий'
                                       f' ингредиент {item}.')
         unique_ingredients = set(str(item) for item in ingredients)

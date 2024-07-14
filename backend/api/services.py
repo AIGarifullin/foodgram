@@ -21,7 +21,8 @@ def create_ingredients(ingredients, recipe):
     ingredient_list = [
         RecipeIngredient(
             recipe=recipe,
-            ingredient=Ingredient.objects.get(id=ingredient.get('id')),
+            ingredient=Ingredient.objects.get(
+                id=ingredient['ingredient']['id']),
             amount=ingredient.get('amount'),
         )
         for ingredient in ingredients
