@@ -7,7 +7,7 @@
 ![Header](https://pictures.s3.yandex.net/resources/image_1711954469.png)
 
 ## Стек проекта
-Python, Django REST Framework, Nginx, DNS, HTTPS, Docker, PostgreSQL, GitHub Actions
+Python, Django REST Framework, Nginx, DNS, HTTPS, Docker, PostgreSQL, GitHub Actions, Pytest, Postman
 
 ## Ссылка на развернутый проект
 https://foodgramprojaig.ddns.net
